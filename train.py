@@ -260,11 +260,12 @@ if __name__ == '__main__':
 
                     # backward + optimize only if in training phase
                     if phase == 'train':
-                        if fp16:  # we use optimier to backward loss
-                            with amp.scale_loss(loss, optimizer) as scaled_loss:
-                                scaled_loss.backward()
-                        else:
-                            loss.backward()
+                        # if fp16:  # we use optimier to backward loss
+                        #     with amp.scale_loss(loss, optimizer) as scaled_loss:
+                        #         scaled_loss.backward()
+                        # else:
+                        #     loss.backward()
+                        loss.backward()
                         optimizer.step()
 
                     # statistics
