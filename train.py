@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # batchsize 32  epochs 60
 from __future__ import print_function, division
-from visdom import Visdom  # python -m visdom.server 启动Visdom监控服务器
+# from visdom import Visdom  # python -m visdom.server 启动Visdom监控服务器
 from tensorboardX import SummaryWriter
 from shutil import copyfile
 import cv2
@@ -42,7 +42,7 @@ if __name__ == '__main__':
                         help='gpu_ids: e.g. 0  0,1,2  0,2')
     parser.add_argument('--name', default='ft_ResNet50',
                         type=str, help='output model name')
-    parser.add_argument('--data_dir', default='..\\..\\dataset\\Market-1501-v15.09.15\\pytorch',
+    parser.add_argument('--data_dir', default='./market1501-mod',
                         type=str, help='training dir path')
     parser.add_argument('--train_all', action='store_true',
                         help='use all training data')
@@ -195,8 +195,8 @@ if __name__ == '__main__':
 
         #best_model_wts = model.state_dict()
         #best_acc = 0.0
-        viz = Visdom()
-        win_loss = viz.scatter(X=np.asarray([[0, 0]]))
+        # viz = Visdom()
+        # win_loss = viz.scatter(X=np.asarray([[0, 0]]))
         #viz.line([[0.],[0.]],[0.],win='loss',opts=dict(title='epoch Loss train&val',legend=['train','val']))
 
         for epoch in range(num_epochs):
@@ -293,10 +293,10 @@ if __name__ == '__main__':
                         save_network(model, epoch)
                     draw_curve(epoch)
 
-            viz.scatter(X=np.array([[epoch, y_loss['train'][-1]]]),
-                        name="train", win=win_loss, update='append')
-            viz.scatter(X=np.array([[epoch, y_loss['val'][-1]]]),
-                        name="val", win=win_loss, update='append')
+            # viz.scatter(X=np.array([[epoch, y_loss['train'][-1]]]),
+            #             name="train", win=win_loss, update='append')
+            # viz.scatter(X=np.array([[epoch, y_loss['val'][-1]]]),
+            #             name="val", win=win_loss, update='append')
 
             time_elapsed = time.time() - since
             print('Training complete in {:.0f}m {:.0f}s'.format(

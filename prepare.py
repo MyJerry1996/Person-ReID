@@ -5,7 +5,7 @@ from shutil import copyfile
 #download_path = '/home/lxwang/MyProjects/first_test_reid/Market'
 #download_path = '/home/lxwang/MyProjects/first_test_reid/DukeMTMC-reID'
 #download_path = '/home/lxwang/MyProjects/first_test_reid/cuhk03'
-download_path = '..\\..\\dataset\\Market-1501-v15.09.15'
+download_path = '/home/nfs/nfsstorage_tmp/ai_research/public/ReID_Group/data/market1501'
 
 if not os.path.isdir(download_path):            #判断是否存在这个目录
     print('please change the download_path')
