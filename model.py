@@ -65,7 +65,9 @@ class ft_net(nn.Module):
 
     def __init__(self, class_num, droprate=0.5, stride=2):
         super(ft_net, self).__init__()
-        model_ft = models.resnet50(pretrained=True)
+        print("start generating model...")
+        # model_ft = models.resnet50(pretrained=True)
+        model_ft = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
         #print(model_ft)
         # avg pooling to global pooling
         if stride == 1:
