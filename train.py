@@ -113,6 +113,7 @@ def train_model(model, dataloader, use_gpu, num_epochs=25):
     best_acc = 0.0
     print("training...")
     for epoch in range(1, num_epochs + 1):
+        wandb.log({"epochs": epoch})
         since = time.time()
         print('Epoch {}/{}'.format(epoch, num_epochs))
         print('-' * 10)
@@ -173,31 +174,37 @@ def train_model(model, dataloader, use_gpu, num_epochs=25):
                 else:  # for the old version like 0.3.0 and 0.3.1
                     running_loss += loss.data[0] * now_batch_size
                 running_corrects += float(torch.sum(preds == labels.data))
-            if phase == 'train':
-                scheduler.step()
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects / dataset_sizes[phase]
 
-            if epoch_acc > best_acc:
-                save_network(model, 'best', opt.exp_name)
-                best_acc = epoch_acc
-
-            wandb.log({"loss": epoch_loss, "epoch": epoch,
-                       "lr": optimizer.state_dict()["param_groups"][0]["lr"]})
-
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(
-                phase, epoch_loss, epoch_acc))
-
-            # deep copy the model
+            if phase == 'train':
+                train_loss = epoch_loss
+                train_acc = epoch_acc
+                wandb.log({"train loss": train_loss, "epochs": epoch})
+                wandb.log({"train_acc": train_acc, "epochs": epoch})
+                wandb.log({"lr": optimizer.state_dict()["param_groups"][0]["lr"], "epochs": epoch})
+                scheduler.step()
+                
             if phase == 'val':
+                val_loss = epoch_loss
+                val_acc = epoch_acc
+                wandb.log({"val loss": val_loss, "epochs": epoch})
+                wandb.log({"val_acc": val_acc, "epochs": epoch})
+                
+                if val_acc > best_acc:
+                    save_network(model, 'best', opt.exp_name)
+                    best_acc = val_acc
+
+                # deep copy the model
                 last_model_wts = model.state_dict()
                 if epoch % 4 == 0:
                     save_network(model, epoch, opt.exp_name)
-                # draw_curve(epoch)
+            
+            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
         time_elapsed = time.time() - since
-        print('Training complete in {:.0f}m {:.0f}s'.format(
+        print('Training complete in {:.0f}m {:.0f}s\n'.format(
             time_elapsed // 60, time_elapsed % 60))
         # print('Best val Acc: {:4f}'.format(best_acc))
 
@@ -239,7 +246,7 @@ if __name__ == '__main__':
     parser.add_argument('--droprate', default=0.5,
                         type=float, help='drop rate')
     parser.add_argument('--exp_name', default='exp', help='name of exp')
-    parser.add_argument('--epochs', default=60, help='num of epochs')
+    parser.add_argument('--epochs', default=30, type=int, help='num of epochs')
     # parser.add_argument('--fp16', action='store_true',
     #                     help='use float16 instead of float32, which will save about 50% memory')
     opt = parser.parse_args()
@@ -247,8 +254,8 @@ if __name__ == '__main__':
     wandb.init(project='test-ReID',
                name=opt.exp_name,
                config=dict(learing_rate=opt.lr,
-                           batch_size=opt.batchsize, epoch=opt.epochs)
-               )
+                           batch_size=opt.batchsize, 
+                           epoch=opt.epochs))
 
     # fp16 = opt.fp16
     str_ids = opt.gpu_ids.split(',')
@@ -279,7 +286,8 @@ if __name__ == '__main__':
     opts_path = os.path.join(dir_name, 'opts.yaml')
     with open(opts_path, 'w') as fp:
         yaml.dump(vars(opt), fp, default_flow_style=False)
-    model = ft_net(len(class_names), opt.droprate, opt.stride) if opt.use_dense else ft_net_dense(len(class_names), opt.droprate)
+    model = ft_net_dense(len(class_names), opt.droprate) if opt.use_dense else \
+            ft_net(len(class_names), opt.droprate, opt.stride)
     model = model.cuda()
     
     print("*" * 20)

@@ -65,7 +65,7 @@ class ft_net(nn.Module):
 
     def __init__(self, class_num, droprate=0.5, stride=2):
         super(ft_net, self).__init__()
-        print("start generating model...")
+        print("start generating ft_net model...")
         # model_ft = models.resnet50(pretrained=True)
         model_ft = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
         #print(model_ft)
@@ -96,7 +96,9 @@ class ft_net_dense(nn.Module):
 
     def __init__(self, class_num, droprate=0.5):
         super().__init__()
-        model_ft = models.densenet121(pretrained=True)
+        print("start generating ft_net_dense model...")
+        # model_ft = models.densenet121(pretrained=True)
+        model_ft = models.densenet121(weights=models.DenseNet121_Weights.IMAGENET1K_V1)
         model_ft.features.avgpool = nn.AdaptiveAvgPool2d((1,1))
         model_ft.fc = nn.Sequential()
         self.model = model_ft

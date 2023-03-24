@@ -162,7 +162,7 @@ def train_model(model, dataloader, use_gpu, num_epochs=25):
             # {'params': model.classifier6.parameters(), 'lr': 0.01},
             # {'params': model.classifier7.parameters(), 'lr': 0.01}
         ], weight_decay=5e-4, momentum=0.9, nesterov=True)
-    print(json.dumps(optimizer.state_dict()["param_groups"][0]["lr"],indent=4))
+    # print(json.dumps(optimizer.state_dict()["param_groups"][0]["lr"],indent=4))
 
     # set scheduler
     scheduler = lr_scheduler.StepLR(
@@ -272,7 +272,7 @@ def train_model(model, dataloader, use_gpu, num_epochs=25):
                 # draw_curve(epoch)
 
         time_elapsed = time.time() - since
-        print('Training complete in {:.0f}m {:.0f}s'.format(
+        print('Training complete in {:.0f}m {:.0f}s\n'.format(
             time_elapsed // 60, time_elapsed % 60))
         # print('Best val Acc: {:4f}'.format(best_acc))
 
